@@ -1,0 +1,122 @@
+# ========================================================================
+# TUH EEG Preprocessing Configuration - FINAL CORRECTED VERSION
+# ========================================================================
+# Version: 4.0 (CORRECTED - Uniform thresholds based on actual data)
+# Date: March 2026
+#
+# CRITICAL CORRECTION:
+# All TUH datasets (TUAB, TUAR, TUEP, TUEV, TUSL, TUSZ) have NORMAL amplitude
+# ranges (20-200 µV). The "low amplitude" assumption for TUSL/TUSZ was incorrect.
+# 
+# Verification showed:
+# - TUAB: 22 µV median STD ✅
+# - TUAR: 159 µV median STD ✅
+# - TUEP: 26 µV median STD ✅
+# - TUEV: 205 µV median STD ✅
+# - TUSL: 159 µV median STD ✅ (NOT low!)
+# - TUSZ: 35 µV median STD ✅ (NOT low!)
+#
+# Solution: Use UNIFORM thresholds for all datasets
+# ========================================================================
+
+preprocessing:
+  # Sampling and segmentation
+  target_sfreq: 200  # Hz
+  segment_duration: 10.0  # seconds
+  segment_overlap: 0.0  # seconds (0 = non-overlapping)
+  
+  # Target channels (20-channel TCP montage)
+  n_channels: 20
+  target_channels:
+    - 'FP1-F7'
+    - 'F7-T3'
+    - 'T3-T5'
+    - 'T5-O1'
+    - 'FP2-F8'
+    - 'F8-T4'
+    - 'T4-T6'
+    - 'T6-O2'
+    - 'T3-C3'
+    - 'C3-CZ'
+    - 'CZ-C4'
+    - 'C4-T4'
+    - 'FP1-F3'
+    - 'F3-C3'
+    - 'C3-P3'
+    - 'P3-O1'
+    - 'FP2-F4'
+    - 'F4-C4'
+    - 'C4-P4'
+    - 'P4-O2'
+  
+  # Bandpass filter
+  bandpass_filter:
+    apply: true
+    low: 0.5  # Hz
+    high: 75.0  # Hz
+    method: 'fir'
+    phase: 'zero'
+  
+  # Notch filter (powerline noise)
+  notch_filter:
+    apply: true
+    frequency: 60  # Hz (North America)
+    method: 'spectrum_fit'
+  
+  # Normalization
+  normalization:
+    method: 'global_zscore'
+    epsilon: 1.0e-8
+
+# ========================================================================
+# UNIFORM QUALITY CONTROL THRESHOLDS (All Datasets)
+# ========================================================================
+# Based on actual amplitude verification showing all datasets have
+# normal clinical EEG amplitude ranges (20-200 µV typical)
+# ========================================================================
+
+quality_control:
+  # Use same thresholds for all datasets
+  use_adaptive_thresholds: false
+  
+  # Uniform thresholds for all TUH datasets
+  uniform_thresholds:
+    min_median_std: 0.5           # µV - reasonable minimum
+    max_amplitude_percentile: 95  # Use 95th percentile
+    max_amplitude_threshold: 500.0  # µV - reject extreme artifacts
+    min_signal_range: 1.0         # µV - minimum peak-to-peak
+    max_flat_channels_ratio: 0.5  # 50% max flat channels
+    flat_threshold: 0.1           # µV - channel considered flat
+    description: "Uniform thresholds for all TUH datasets (normal clinical EEG)"
+
+# Visualization settings
+visualization:
+  generate_plots: true
+  plot_types:
+    - 'raw_eeg_traces'
+    - 'psd_analysis'
+    - 'frequency_bands'
+    - 'spatial_distribution'
+    - 'dataset_statistics'
+    - 'preprocessing_pipeline'
+    - 'quality_metrics'
+  max_samples_to_plot: 5
+  dpi: 300
+  format: 'png'
+
+# Output paths
+output:
+  base_dir: 'neurovault_data'
+
+# Feature extraction
+features:
+  extract_band_powers: true
+  extract_psd: true
+  extract_spatial: true
+  
+  frequency_bands:
+    delta: [0.5, 4]
+    theta: [4, 8]
+    alpha: [8, 13]
+    beta: [13, 30]
+    gamma: [30, 50]

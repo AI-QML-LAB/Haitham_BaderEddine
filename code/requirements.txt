@@ -1,0 +1,28 @@
+# NeuroVault TUH EEG Preprocessing Requirements
+# Python 3.8+
+
+# Core EEG Processing
+mne>=1.5.0
+pyedflib>=0.1.30
+
+# Numerical Computing
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Machine Learning
+scikit-learn>=1.3.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Configuration
+PyYAML>=6.0
+
+# Utilities
+tqdm>=4.65.0
+pandas>=2.0.0
+
+# Optional but recommended
+joblib>=1.3.0
+h5py>=3.8.0  # For HDF5 output format
